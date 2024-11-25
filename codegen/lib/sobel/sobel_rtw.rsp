@@ -1,0 +1,7 @@
+conv2AXPY.obj
+sobel.obj
+sobel_data.obj
+sobel_emxAPI.obj
+sobel_emxutil.obj
+sobel_initialize.obj
+sobel_terminate.obj

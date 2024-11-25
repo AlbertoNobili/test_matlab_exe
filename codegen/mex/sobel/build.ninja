@@ -1,0 +1,54 @@
+# CompilerName=msvc150
+# Mode=optim
+ninja_required_version = 1.3
+
+# Basic folders
+root = .
+builddir = $root\build\win64
+matlabdir = C:\Program Files\MATLAB\R2019b
+startdir = C:\Users\alber\Desktop\test_matlab_exe
+
+# Toolchain information
+cc = cl
+cxx = cl
+linker = link
+linkerxx = link
+
+cflags =  /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /I "$root" /I "$startdir" /I "$root\interface" /I "$matlabdir\extern\include" /I "$matlabdir\simulink\include" /I "$matlabdir\rtw\c\src" /I "$matlabdir\rtw\c\src\ext_mode\common" /I "$matlabdir\rtw\c\ert" /I "." -DMODEL=sobel_mex -DHAVESTDIO -DUSE_RTMODEL /openmp 
+
+cxxflags =   /c /Zp8 /GR /W3 /EHs /nologo /MD /D_CRT_SECURE_NO_DEPRECATE /D_SCL_SECURE_NO_DEPRECATE /D_SECURE_SCL=0   /DMATLAB_MEX_FILE  /DMATLAB_MEX_FILE /O2 /Oy- /DNDEBUG /fp:strict /I "$root" /I "$startdir" /I "$root\interface" /I "$matlabdir\extern\include" /I "$matlabdir\simulink\include" /I "$matlabdir\rtw\c\src" /I "$matlabdir\rtw\c\src\ext_mode\common" /I "$matlabdir\rtw\c\ert" /I "." -DMODEL=sobel_mex -DHAVESTDIO -DUSE_RTMODEL /openmp 
+
+ldflags =  /nologo /manifest   /DLL /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmx.lib libmex.lib libmat.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib  /out:"sobel_mex.mexw64" /LIBPATH:"$matlabdir\extern\lib\win64\microsoft" libmwblas.lib libemlrt.lib libcovrt.lib libut.lib libmwmathutil.lib libiomp5md.lib /nodefaultlib:vcomp /LIBPATH:"$matlabdir\bin\win64" /export:mexFunction /export:mexfilerequiredapiversion /export:emlrtMexFcnProperties /export:sobel_initialize /export:sobel_terminate /export:sobel_atexit /export:sobel /export:emlrtGetRootTLSGlobal /export:emlrtLockerFunction /export:emxEnsureCapacity_uint8_T /export:emxInit_real_T /export:emxFree_real_T /export:emxEnsureCapacity_real_T /export:emxInit_uint8_T /export:emxFree_uint8_T
+
+# Build Rules
+rule cc
+    command = $cc $cflags $in /Fo$out
+
+rule cxx
+    command = $cxx $cxxflags $in /Fo$out
+
+rule link
+    command = $linker @$out.rsp $ldflags
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule linkxx
+    command = $linkerxx $in $ldflags
+
+# Build
+build $builddir\rt_nonfinite.obj : cc $root\rt_nonfinite.c
+build $builddir\sobel_mexutil.obj : cc $root\sobel_mexutil.c
+build $builddir\sobel_data.obj : cc $root\sobel_data.c
+build $builddir\sobel_initialize.obj : cc $root\sobel_initialize.c
+build $builddir\sobel_terminate.obj : cc $root\sobel_terminate.c
+build $builddir\sobel.obj : cc $root\sobel.c
+build $builddir\conv2AXPY.obj : cc $root\conv2AXPY.c
+build $builddir\xaxpy.obj : cc $root\xaxpy.c
+build $builddir\_coder_sobel_api.obj : cc $root\interface\_coder_sobel_api.c
+build $builddir\_coder_sobel_mex.obj : cc $root\interface\_coder_sobel_mex.c
+build $builddir\sobel_emxutil.obj : cc $root\sobel_emxutil.c
+build $builddir\_coder_sobel_info.obj : cc $root\interface\_coder_sobel_info.c
+build $builddir\c_mexapi_version.obj : cc $matlabdir\extern\version\c_mexapi_version.c
+
+# Link
+build $root\sobel_mex.mexw64 : link $builddir\rt_nonfinite.obj $builddir\sobel_mexutil.obj $builddir\sobel_data.obj $builddir\sobel_initialize.obj $builddir\sobel_terminate.obj $builddir\sobel.obj $builddir\conv2AXPY.obj $builddir\xaxpy.obj $builddir\_coder_sobel_api.obj $builddir\_coder_sobel_mex.obj $builddir\sobel_emxutil.obj $builddir\_coder_sobel_info.obj $builddir\c_mexapi_version.obj 
