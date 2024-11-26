@@ -1,6 +1,8 @@
 %% Generate executable
 cfg = coder.config('exe');
-%codegen -report -config cfg sobel main.c main.h
+if isfile(".\sobel.exe") == false
+	codegen -report -config cfg sobel main.c main.h
+end
 
 %% Test executable
 im = imread('hello.jpg');

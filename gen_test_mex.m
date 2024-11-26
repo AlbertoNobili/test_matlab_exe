@@ -12,7 +12,9 @@ image(im3);
 title('Script result');
 
 %% Generate and run mex
-%codegen -report sobel
+if isfile(".\sobel_mex") ==0
+	codegen -report sobel
+end
 edgeImMex = sobel_mex(gray, 0.7);
 im3Mex = repmat(edgeImMex, [1 1 3]);
 figure();
